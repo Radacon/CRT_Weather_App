@@ -24,7 +24,11 @@ def delete_images(directory, extensions):
 
 # Define the folder and extensions
 weathertiles_folder = "./weathertiles"
-file_extensions_to_delete = [".gif", ".png"]
+
+#Disabling this for dev work (I'm not failing gracefully when I don't have weather gifs)
+#file_extensions_to_delete = [".gif", ".png"]
+
+file_extensions_to_delete = [".png"]
 
 # Run the deletion function
 delete_images(weathertiles_folder, file_extensions_to_delete)
