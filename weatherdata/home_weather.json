@@ -1,0 +1,16 @@
+{
+    "temperature": 6.93,
+    "conditions": "light snow",
+    "wind_speed_mph": 1.01,
+    "wind_direction": "SE",
+    "gusts_mph": 1.99,
+    "humidity_percent": 81,
+    "dewpoint": 25.54,
+    "ceiling_feet": 10000,
+    "visibility_miles": 0.0,
+    "pressure_inhg": 30.62261,
+    "pressure_trend": "steady",
+    "icon_url": "http://openweathermap.org/img/wn/13n@2x.png",
+    "observation_time": "2025-01-18 20:59:42 Pacific Standard Time",
+    "location": "Denver"
+}

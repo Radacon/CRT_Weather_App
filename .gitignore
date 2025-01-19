@@ -1,0 +1,10 @@
+# Ignore /settings_private.json
+/settings_private.json
+
+# Ignore all images in subfolders of /weathertiles/ but not directly in /weathertiles/
+weathertiles/*/*
+!weathertiles/*/
+
+/__pycache__/*
+
+radar_getter/images/boundaries/counties.geojson

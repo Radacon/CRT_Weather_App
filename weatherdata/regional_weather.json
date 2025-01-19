@@ -1,0 +1,40 @@
+{
+    "observation_time": "2025-01-18 21:06:09 Pacific Standard Time",
+    "regional_weather": [
+        {
+            "location": "Los Angeles",
+            "conditions": "Clear sky",
+            "temperature": 50.6
+        },
+        {
+            "location": "Chicago",
+            "conditions": "Overcast clouds",
+            "temperature": 18.7
+        },
+        {
+            "location": "Houston",
+            "conditions": "Overcast clouds",
+            "temperature": 48.0
+        },
+        {
+            "location": "Phoenix",
+            "conditions": "Clear sky",
+            "temperature": 52.1
+        },
+        {
+            "location": "Seattle",
+            "conditions": "Few clouds",
+            "temperature": 35.0
+        },
+        {
+            "location": "New York",
+            "conditions": "Mist",
+            "temperature": 39.0
+        },
+        {
+            "location": "Miami",
+            "conditions": "Scattered clouds",
+            "temperature": 70.6
+        }
+    ]
+}
