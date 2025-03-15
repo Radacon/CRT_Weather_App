@@ -120,14 +120,14 @@ def update_leds(full_position):
 def toggle_power_and_mute():
     global power_state, is_muted, saved_volume, long_press_triggered
     if power_state == 1:
-        # Long press action: power ON -> turn OFF and mute.
+        # Turn power off: update both variable and physical pin.
         power_state = 0
+        GPIO.output(POWER_PIN, GPIO.LOW)  # Set physical pin LOW
         if not is_muted:
             saved_volume = current_volume
             is_muted = True
             request_volume_update(0)
         long_press_triggered = True
-        # Immediately force red LED so it's visible.
         try:
             pwm_red.ChangeDutyCycle(100)
             pwm_green.ChangeDutyCycle(0)
@@ -136,17 +136,18 @@ def toggle_power_and_mute():
             pass
         print("Long press: Power toggled to LOW and muted.")
     else:
-        # Short press when power is off: toggle power ON and unmute.
+        # Turn power on: update both variable and physical pin.
         power_state = 1
+        GPIO.output(POWER_PIN, GPIO.HIGH)  # Set physical pin HIGH
         if is_muted:
             is_muted = False
             request_volume_update(saved_volume)
-            # Synchronize the encoder state with the restored volume.
             half_steps = (saved_volume // 5) * 2
             last_printed_position = saved_volume
             update_leds(half_steps // 2)
         print("Short press: Power toggled to HIGH and unmuted.")
     write_gpio_state()
+
 
 
 def toggle_mute():
