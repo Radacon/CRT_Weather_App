@@ -1,4 +1,6 @@
 {
+    "somastream_url": "https://ice2.somafm.com/vaporwaves-128-mp3",
+    "default_volume": 50,
     "debug": false,
     "slide_debug": -1,
     "cycle_interval": 2000,

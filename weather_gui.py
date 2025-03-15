@@ -1,4 +1,6 @@
 import os
+import sys
+os.environ["QT_QPA_PLATFORM"] = "linuxfb"
 import json
 from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget
 from PyQt5.QtCore import QTimer, Qt
@@ -6,8 +8,17 @@ from PyQt5.QtGui import QCursor
 import subprocess  # For running external scripts
 from datetime import datetime
 import threading
+from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget, QLabel
+from PyQt5.QtCore import QTimer, Qt, pyqtSignal
+from PyQt5.QtGui import QCursor
+import speaker_and_GPIO_Test
+import subprocess
+
+GPIO_STATES_FILE = "./gpio_states.json"   # adjust the path as needed
 
 class WeatherApp(QMainWindow):
+    # Create a custom signal that carries the volume value (as an integer, for example)
+    volumeChanged = pyqtSignal(int)
     def __init__(self):
         # Load settings from settings.json
         settings = self.load_settings()
@@ -48,6 +59,31 @@ class WeatherApp(QMainWindow):
             self.stack.setCurrentIndex(self.slide_debug - 1)
             self.timer.stop()
 
+        # ----------------------------
+        # Volume / Power-off Display Setup (Centered)
+        # ----------------------------
+        # Create a label of size 400x100 centered on a 720x480 screen.
+        label_width, label_height = 400, 100
+        x = (720 - label_width) // 2
+        y = (480 - label_height) // 2
+        self.volume_label = QLabel(self)
+        self.volume_label.setGeometry(x, y, label_width, label_height)
+        self.volume_label.setAlignment(Qt.AlignCenter)
+        # Solid black background with large white text
+        self.volume_label.setStyleSheet("background-color: black; color: white; font-size: 48px;")
+        self.volume_label.hide()  # Start hidden
+
+        # Timer to hide the display after 3 seconds
+        self.display_timer = QTimer(self)
+        self.display_timer.setSingleShot(True)
+        self.display_timer.timeout.connect(self.hideDisplay)
+
+        # Timer to poll the JSON file
+        self.gpio_timer = QTimer(self)
+        self.gpio_timer.timeout.connect(self.check_gpio_state)
+        self.gpio_timer.start(200)  # every 200 ms
+
+        self.last_volume = None
 
         # Timer to run radar script every 5 minutes
         if debug is False:
@@ -73,9 +109,6 @@ class WeatherApp(QMainWindow):
             self.regional_weather_timer = QTimer(self)
             self.regional_weather_timer.timeout.connect(self.run_regional_weather_script_in_thread)
             self.regional_weather_timer.start((weather_refresh * 60 * 1000)+60000)  # Every x minutes + 60 seconds (set in json) maybe there's a colission? 
-
-
-
 
     def check_and_run_radar(self):
         """Check if it's the 15-minute mark of the hour and run radar script."""
@@ -129,8 +162,6 @@ class WeatherApp(QMainWindow):
         except Exception as e:
             print(f"Unexpected error: {e}")
 
-
-
     def load_settings(self):
         """Load settings from settings.json file."""
         settings_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "settings.json")
@@ -169,10 +200,44 @@ class WeatherApp(QMainWindow):
         if self.slide_debug == -1:  # Only cycle if slide_debug is -1
             self.current_index = (self.current_index + 1) % len(self.guis)
             self.stack.setCurrentIndex(self.current_index)
-        
+
+        # ---------------
+    
+    def showDisplay(self, text):
+        self.volume_label.setText(text)
+        self.volume_label.show()
+        self.display_timer.start(3000)  # Hide after 3 seconds
+
+    def hideDisplay(self):
+        self.volume_label.hide()
+
+    def check_gpio_state(self):
+        """Read the JSON file and update the display accordingly."""
+        try:
+            if os.path.exists(GPIO_STATES_FILE):
+                with open(GPIO_STATES_FILE, "r") as f:
+                    data = json.load(f)
+                # If there is a power_off_countdown, display that message
+                if "power_off_countdown" in data:
+                    countdown = data["power_off_countdown"]
+                    self.showDisplay(f"Power off in {countdown}")
+                else:
+                    # Otherwise, display volume if it has changed.
+                    volume = data.get("volume")
+                    if volume is not None and volume != self.last_volume:
+                        self.last_volume = volume
+                        self.showDisplay(f"Volume: {volume}%")
+        except Exception as e:
+            print("Error reading gpio_states.json:", e)
+
 if __name__ == "__main__":
-    import sys
+    # Launch the GPIO script as a separate process.
+    gpio_script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "speaker_and_GPIO_Test.py")
+    gpio_process = subprocess.Popen(["python3", gpio_script_path])
     app = QApplication(sys.argv)
     window = WeatherApp()
     window.show()
-    sys.exit(app.exec_())
+    exit_code = app.exec_()
+    # Optionally terminate the GPIO process on exit.
+    gpio_process.terminate()
+    sys.exit(exit_code)
