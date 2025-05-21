@@ -30,7 +30,7 @@ GPIO_STATES_FILE = "./gpio_states.json"
 half_steps = 0
 last_printed_position = 0
 current_volume = 0   # Start muted
-saved_volume = 50    # Default saved volume for unmuting
+saved_volume = 50    # Default saved volume for unmuting  
 is_muted = True
 mpg123_process = None
 
@@ -95,11 +95,14 @@ def stop_stream():
 # --- Volume Control Thread ---
 def volume_control_thread():
     global current_volume
+    last_volume = None
     while True:
-        time.sleep(0.1)
-        subprocess.run(["sudo", "amixer", "set", "PCM", f"{current_volume}%"],
-                       stdout=subprocess.DEVNULL,
-                       stderr=subprocess.DEVNULL)
+        time.sleep(0.01)
+        if current_volume != last_volume:     
+            subprocess.run(["sudo", "amixer", "set", "PCM", f"{current_volume}%"],
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL)
+            last_volume = current_volume
 
 # --- Request Volume Update ---
 def request_volume_update(volume):
