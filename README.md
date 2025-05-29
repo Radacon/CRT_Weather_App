@@ -4,7 +4,7 @@ This project transforms a New Old Stock (NOS) Cathode Ray Tube (CRT) display int
 
 For more details, you can refer to the original blog post: [Retro CRT Weather Display Blog Post](https://farnsworth.engineering/index.php/2025/03/17/retro-crt-weather-display/)
 
-Watch a demonstration of the project here: [YouTube Video Demo](#)
+Watch a demonstration of the project here: [YouTube Video Demo](https://youtu.be/hUSNxKH7OT0)
 
 ## Features
 
