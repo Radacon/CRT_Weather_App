@@ -1,0 +1,3 @@
+Sorry for the mix in files, I have a solidworks macro that can export multiple bodies in a single part and it only seems to work with .stls. 
+
+If you're using bambustudio just import Split2[1] and Split2[2] as a single object with multiple parts so you can do multicolor. 
